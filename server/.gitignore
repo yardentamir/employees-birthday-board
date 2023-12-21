@@ -1,0 +1,12 @@
+# Node.js
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+*.tsk
+
+# Yarn
+yarn-error.log
+.pnp/
+.pnp.js
+yarn.lock
