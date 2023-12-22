@@ -10,9 +10,11 @@
     "dev": "nodemon server.ts"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/http-errors": "^2.0.4",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^14.0.0",
     "@types/validator": "^13.11.7",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
@@ -23,12 +25,14 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "date-fns": "^3.0.5",
     "dotenv": "^16.3.1",
     "envalid": "^8.0.0",
     "express": "^4.18.2",
     "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.3",
     "validator": "^13.11.0"

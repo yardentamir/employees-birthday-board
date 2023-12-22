@@ -1,8 +1,14 @@
 import express from "express";
-import { addEmployee } from "../controllers/employee.controller";
+import { login, signup } from "../controllers/employee.controller";
 
 const rootRouter = express.Router();
 
-rootRouter.post("/addEmployee", addEmployee);
+rootRouter.post("/signup", signup);
+
+// rootRouter.get("/me", auth, async (req, res) => {
+//   res.status(200).send(req.employee);
+// });
+
+rootRouter.post("/login", login);
 
 export default rootRouter;
