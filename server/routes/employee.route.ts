@@ -1,5 +1,9 @@
 import express from "express";
-import { login, signup } from "../controllers/employee.controller";
+import {
+  loadEmployees,
+  login,
+  signup,
+} from "../controllers/employee.controller";
 
 const rootRouter = express.Router();
 
@@ -10,5 +14,7 @@ rootRouter.post("/signup", signup);
 // });
 
 rootRouter.post("/login", login);
+
+rootRouter.get("/loadEmployees", loadEmployees);
 
 export default rootRouter;

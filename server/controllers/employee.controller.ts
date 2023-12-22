@@ -29,4 +29,14 @@ const login: RequestHandler = async (req, res) => {
   }
 };
 
-export { login, signup };
+const loadEmployees: RequestHandler = async (req, res) => {
+  try {
+    const employees = await employeeModel.find();
+
+    res.status(201).send(employees);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+export { loadEmployees, login, signup };
