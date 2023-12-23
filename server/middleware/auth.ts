@@ -1,20 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { cleanEnv, str } from "envalid";
-import { NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import Employee, { IEmployee } from "../models/employee.model";
-
 const { SECRET_KEY } = cleanEnv(process.env, {
   SECRET_KEY: str(),
 });
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   token?: string;
   employee?: IEmployee;
 }
 
 const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const authorizationHeader = req.headers.get("authorization");
+    const authorizationHeader = req.headers["authorization"];
 
     console.log("header ", authorizationHeader);
 
@@ -29,8 +29,6 @@ const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
       _id: decoded._id,
       "tokens.token": token,
     });
-
-    console.log("found!");
 
     if (!employee) {
       throw new Error("There is no such user");
