@@ -31,7 +31,7 @@ const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
     });
 
     if (!employee) {
-      throw new Error("There is no such user");
+      throw new Error("You're not connected, please authenticate");
     }
 
     req.token = token;

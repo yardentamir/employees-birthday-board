@@ -1,5 +1,7 @@
 import { RequestHandler } from "express";
+import { AuthRequest } from "../middleware/auth";
 import employeeModel from "../models/employee.model";
+import BirthdayService from "../service/birthday.service";
 
 const signup: RequestHandler = async (req, res) => {
   try {
@@ -39,4 +41,55 @@ const loadEmployees: RequestHandler = async (req, res) => {
   }
 };
 
-export { loadEmployees, login, signup };
+const logOut: RequestHandler = async function (req: AuthRequest, res) {
+  try {
+    if (req.employee) {
+      req.employee.tokens = req.employee.tokens.filter((token) => {
+        return token.token !== req.token;
+      });
+      await req.employee.save();
+
+      res.status(200).send("log out successfully!");
+    } else {
+      res.status(401).send("Unauthorized");
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+const logOutAll: RequestHandler = async (req: AuthRequest, res) => {
+  try {
+    if (req.employee) {
+      req.employee.tokens = [];
+      await req.employee.save();
+      res.send();
+    } else {
+      res.status(401).send("Unauthorized");
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+const loadEmployeesWithBirthdays: RequestHandler = async (
+  req: AuthRequest,
+  res
+) => {
+  try {
+    const employeesWithBirthdays =
+      await BirthdayService.getEmployeesWithBirthdaysToday();
+    res.status(200).json(employeesWithBirthdays);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export {
+  loadEmployees,
+  loadEmployeesWithBirthdays,
+  logOut,
+  logOutAll,
+  login,
+  signup,
+};

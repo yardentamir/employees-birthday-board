@@ -1,21 +1,16 @@
 import bcrypt from "bcrypt";
 import { cleanEnv, str } from "envalid";
 import jwt from "jsonwebtoken";
-import { InferSchemaType, Model, Schema, model } from "mongoose";
+import { Document, InferSchemaType, Model, Schema, model } from "mongoose";
 import validator from "validator";
 
-// interface BirthdayWish {
-//   sender: string;
-//   message: string;
-// }
-
-export interface IEmployee extends Document {
+export interface IEmployee extends Omit<Document, "toJSON"> {
   name: string;
   email: string;
   password: string;
   birthDate: Date;
   tokens: { token: string }[];
-  toJSON: () => void;
+  toJSON: () => Omit<this, "password" | "tokens">;
   generateAuthToken(): Promise<string>;
 }
 
@@ -58,24 +53,6 @@ const employeeSchema = new Schema(
         },
       },
     ],
-    // birthdayWishes: [email
-    //   {
-    //     type: [
-    //       new Schema<BirthdayWish>({
-    //         sender: {
-    //           type: String,
-    //           validate(value: string) {
-    //             if (!validator.isMongoId(value)) {
-    //               throw new Error("Not a mongo identifier");
-    //             }
-    //           },
-    //         },
-    //         message: String,
-    //       }),
-    //     ],
-    //     default: [],
-    //   },
-    // ],
   },
   { timestamps: true }
 );
