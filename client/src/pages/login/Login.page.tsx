@@ -11,10 +11,7 @@ import {
   TypographyProps,
 } from "@mui/material";
 import { FC, FormEvent, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { decrement, increment } from "../../features/counterSlice";
 import axiosInstance from "../../services/client";
-import type { RootState } from "../../store";
 
 const Copyright: FC<TypographyProps> = (props) => {
   return (
@@ -42,9 +39,6 @@ const SignIn: React.FC = () => {
       password: data.get("password"),
     });
   };
-
-  const count = useSelector((state: RootState) => state.counter.value);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,23 +119,6 @@ const SignIn: React.FC = () => {
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
-      <div>
-        <div>
-          <button
-            aria-label="Increment value"
-            onClick={() => dispatch(increment())}
-          >
-            Increment
-          </button>
-          <span>{count}</span>
-          <button
-            aria-label="Decrement value"
-            onClick={() => dispatch(decrement())}
-          >
-            Decrement
-          </button>
-        </div>
-      </div>
     </Container>
   );
 };
