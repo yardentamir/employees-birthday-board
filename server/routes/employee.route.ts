@@ -1,29 +1,26 @@
 import express from "express";
-import {
-  loadEmployees,
-  loadEmployeesWithBirthdays,
-  logOut,
-  logOutAll,
-  login,
-  signup,
-} from "../controllers/employee.controller";
+import * as c from "../controllers/employee.controller";
 import auth, { AuthRequest } from "../middleware/auth";
 const rootRouter = express.Router();
 
-rootRouter.post("/signup", signup);
+rootRouter.post("/signup", c.signup);
 
 rootRouter.get("/me", auth, async function (req: AuthRequest, res) {
   res.status(200).send(req.employee);
 });
 
-rootRouter.post("/login", login);
+rootRouter.post("/login", c.login);
 
-rootRouter.post("/logOut", auth, logOut);
+rootRouter.post("/logOut", auth, c.logOut);
 
-rootRouter.post("/logOutAll", auth, logOutAll);
+rootRouter.post("/logOutAll", auth, c.logOutAll);
 
-rootRouter.get("/employeesWithBirthdays", auth, loadEmployeesWithBirthdays);
+rootRouter.get("/employeesWithBirthdays", auth, c.loadEmployeesWithBirthdays);
 
-rootRouter.get("/loadEmployees", loadEmployees);
+rootRouter.post("/logBirthdayWish", auth, c.logBirthdayWish);
+
+rootRouter.get("/loadEmployeesWithWishes", auth, c.loadEmployeesWithWishes);
+
+rootRouter.get("/loadEmployees", c.loadEmployees);
 
 export default rootRouter;

@@ -1,7 +1,14 @@
 import bcrypt from "bcrypt";
 import { cleanEnv, str } from "envalid";
 import jwt from "jsonwebtoken";
-import { Document, InferSchemaType, Model, Schema, model } from "mongoose";
+import {
+  Document,
+  InferSchemaType,
+  Model,
+  Schema,
+  Types,
+  model,
+} from "mongoose";
 import validator from "validator";
 
 export interface IEmployee extends Omit<Document, "toJSON"> {
@@ -9,6 +16,7 @@ export interface IEmployee extends Omit<Document, "toJSON"> {
   email: string;
   password: string;
   birthDate: Date;
+  receivedWishes: Types.ObjectId[];
   tokens: { token: string }[];
   toJSON: () => Omit<this, "password" | "tokens">;
   generateAuthToken(): Promise<string>;
@@ -45,6 +53,12 @@ const employeeSchema = new Schema(
       // },
     },
     birthDate: { type: Date, required: true },
+    receivedWishes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "BirthdayWish",
+      },
+    ],
     tokens: [
       {
         token: {
