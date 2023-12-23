@@ -11,7 +11,7 @@ import {
   TypographyProps,
 } from "@mui/material";
 import { FC, FormEvent, useEffect } from "react";
-import axiosInstance from "../../services/client";
+import client from "../../services/client";
 
 const Copyright: FC<TypographyProps> = (props) => {
   return (
@@ -29,8 +29,6 @@ const Copyright: FC<TypographyProps> = (props) => {
 };
 
 const SignIn: React.FC = () => {
-  const client = axiosInstance();
-
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -42,17 +40,9 @@ const SignIn: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // try {
-      //   // const resultAction = dispatch(fetchEmployees());
-      //   // const result = resultAction.payload; // Access the payload from the action
-
-      //   console.log(resultAction);
-      // } catch (error) {
-      //   console.error("Error fetching employees:", error);
-      // }
       try {
+        console.log("fetching data...");
         const response = await client.get(`employee/loadEmployees`);
-        // const resultAction = dispatch(fetchEmployees());
         console.log(response);
         return response;
       } catch (error) {
@@ -61,7 +51,7 @@ const SignIn: React.FC = () => {
     };
 
     fetchData();
-  }, []); // Run once when the component mounts
+  }, []);
 
   return (
     <Container component="main" maxWidth="xs">

@@ -87,9 +87,9 @@ const { SECRET_KEY } = cleanEnv(process.env, {
 
 employeeSchema.methods.generateAuthToken = async function () {
   const token = jwt.sign({ _id: this._id.toString() }, SECRET_KEY, {
-    expiresIn: '2 days',
+    expiresIn: "2 days",
   });
-  
+
   console.log("generateAuthToken");
 
   this.tokens = this.tokens.concat({ token });
