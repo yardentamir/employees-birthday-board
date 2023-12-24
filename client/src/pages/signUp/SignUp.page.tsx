@@ -7,7 +7,14 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography, { TypographyProps } from "@mui/material/Typography";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { AxiosError, AxiosResponse } from "axios";
+import { parse } from "date-fns";
+import Cookies from "js-cookie";
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import client from "../../services/client";
 
 const Copyright: React.FC<TypographyProps> = (props) => {
   return (
@@ -25,14 +32,48 @@ const Copyright: React.FC<TypographyProps> = (props) => {
 };
 
 export default function SignUp() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
     console.log({
+      name: data.get("fullName"),
       email: data.get("email"),
       password: data.get("password"),
+      birthDate: data.get("birthDate"),
     });
+
+    const birthDate: string | undefined = data.get("birthDate")?.toString();
+    try {
+      if (
+        !data.get("fullName") ||
+        !data.get("email") ||
+        !data.get("password") ||
+        !birthDate
+      ) {
+        throw new Error("all the fields are required");
+      }
+      console.log("date", parse(birthDate, "dd/MM/yyyy", new Date()));
+      const response: AxiosResponse = await client.post(`employee/signup`, {
+        name: data.get("fullName"),
+        email: data.get("email"),
+        password: data.get("password"),
+        birthDate: parse(birthDate, "dd/MM/yyyy", new Date()),
+      });
+      Cookies.set("accessToken", response.data.token);
+      navigate("/board");
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error("Login failed:", axiosError.message);
+    }
   };
+
+  // React.useEffect(() => {
+  //   const token: string | undefined = Cookies.get("accessToken");
+  //   if (token) navigate("/board");
+  // }, [navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -83,6 +124,28 @@ export default function SignUp() {
                 id="password"
                 autoComplete="new-password"
               />
+            </Grid>
+            <Grid item xs={12}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  format="dd/MM/yyyy"
+                  // value={selectedDay}
+                  // onChange={(newValue) => {
+                  //     setSelectedDay(newValue)
+                  // }}
+                  // remove slotProps to remove customization
+
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      required: true,
+                      name: "birthDate",
+                      id: "birthDate",
+                      autoComplete: "bday",
+                    },
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
           </Grid>
           <Button

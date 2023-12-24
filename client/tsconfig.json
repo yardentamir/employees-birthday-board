@@ -18,7 +18,9 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["babel__template"],
+    "typeRoots": ["./node_modules/@types", "./typings"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

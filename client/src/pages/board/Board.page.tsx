@@ -1,10 +1,9 @@
 import { Email as EmailIcon } from "@mui/icons-material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Avatar, Box, Container, IconButton, Typography } from "@mui/material";
-import { AxiosError, AxiosResponse } from "axios";
-import Cookies from "js-cookie";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { useEffect, useMemo } from "react";
+import MyMenu from "../../components/Menu";
 import client from "../../services/client";
 import { data as initialData, type Person } from "./data";
 
@@ -53,20 +52,12 @@ export const Board: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response: AxiosResponse = await client.post(`employee/login`, {
-          email: "yarden1@walla.co.il",
-          password: "aer12!0r6r",
-        });
-        console.log(response.data);
-
-        Cookies.set("accessToken", response.data.token);
-
-        // Perform any additional actions after successful login
-        console.log("Login successful!", response.data.token);
+        console.log("fetching data...");
+        const response = await client.get(`employee/employeesWithBirthdays`);
+        console.log(response);
+        return response;
       } catch (error) {
-        // Handle login failure
-        const axiosError = error as AxiosError;
-        console.error("Login failed:", axiosError.message);
+        console.error(`Error fetching employees with birthdays`, error);
       }
     };
 
@@ -74,48 +65,52 @@ export const Board: React.FC = () => {
   }, []);
 
   return (
-    <Container
-      component="main"
-      sx={{
-        gap: "10px",
-      }}
-    >
-      <Box
+    <>
+      <MyMenu />
+      <Container
+        component="main"
         sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          gap: "10px",
+          height: "calc(100dvh - 48px)",
         }}
-        gap={4}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Wish Happy Birthday!
-        </Typography>
-      </Box>
-      <MaterialReactTable
-        columns={columns}
-        data={data}
-        enableRowActions
-        renderRowActions={({ row }) => (
-          <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-            <IconButton
-              color="primary"
-              onClick={() =>
-                window.open(
-                  `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.firstName}!`
-                )
-              }
-            >
-              <EmailIcon />
-            </IconButton>
-          </Box>
-        )}
-      />
-    </Container>
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+          gap={4}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" color="light">
+            Wish Happy Birthday!
+          </Typography>
+        </Box>
+        <MaterialReactTable
+          columns={columns}
+          data={data}
+          enableRowActions
+          renderRowActions={({ row }) => (
+            <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
+              <IconButton
+                color="primary"
+                onClick={() =>
+                  window.open(
+                    `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.firstName}!`
+                  )
+                }
+              >
+                <EmailIcon />
+              </IconButton>
+            </Box>
+          )}
+        />
+      </Container>
+    </>
   );
 };
 

@@ -10,7 +10,10 @@ import {
   Typography,
   TypographyProps,
 } from "@mui/material";
+import { AxiosError, AxiosResponse } from "axios";
+import Cookies from "js-cookie";
 import { FC, FormEvent, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import client from "../../services/client";
 
 const Copyright: FC<TypographyProps> = (props) => {
@@ -29,29 +32,29 @@ const Copyright: FC<TypographyProps> = (props) => {
 };
 
 const SignIn: React.FC = () => {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    try {
+      const data = new FormData(event.currentTarget);
+      const response: AxiosResponse = await client.post(`employee/login`, {
+        email: data.get("email"),
+        password: data.get("password"),
+      });
+
+      Cookies.set("accessToken", response.data.token);
+      navigate("/board");
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error("Login failed:", axiosError.message);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log("fetching data...");
-        const response = await client.get(`employee/loadEmployees`);
-        console.log(response);
-        return response;
-      } catch (error) {
-        console.error(`Error fetching movie with :`, error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    const token: string | undefined = Cookies.get("accessToken");
+    if (token) navigate("/board");
+  }, [navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
