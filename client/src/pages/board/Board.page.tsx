@@ -1,5 +1,4 @@
-import { Cake as CakeIcon } from "@mui/icons-material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Cake as CakeIcon, Mail as MailIcon } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -8,15 +7,27 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { useMemo } from "react";
-import MyMenu from "../../components/Menu";
-// import client from "../../services/client";
 import { format } from "date-fns";
+import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import React, { useMemo } from "react";
+import MyMenu from "../../components/Menu";
 import useFetchEmployeesWithBirthdays, { IPerson } from "./Data";
 // import useFetchOnMount from "../../services/useFetchOnMount.hook";
+import WishHappyBirthdayDialog from "./components/WishHappyBirthdayDialog";
 
 export const Board: React.FC = () => {
+  const [openWishDialog, setOpenWishDialog] = React.useState<boolean>(false);
+  const [recipientEmail, setRecipientEmail] = React.useState<string>("");
+
+  const handleOpenWishDialog = (email: string) => {
+    setOpenWishDialog(true);
+    setRecipientEmail(email);
+  };
+
+  const handleCloseWishDialog = () => {
+    setOpenWishDialog(false);
+  };
+
   const columns = useMemo<MRT_ColumnDef<IPerson>[]>(
     () => [
       {
@@ -33,7 +44,6 @@ export const Board: React.FC = () => {
         Cell: ({ renderedCellValue }) => {
           let dateValue: Date | null = null;
 
-          // Check if renderedCellValue is a valid date string
           if (typeof renderedCellValue === "string") {
             dateValue = new Date(renderedCellValue);
           }
@@ -60,19 +70,6 @@ export const Board: React.FC = () => {
   );
 
   const { data, loading, error } = useFetchEmployeesWithBirthdays();
-
-  // if (loading) {
-  //   return <CircularProgress />;
-  // }
-
-  // if (error) {
-  //   return (
-  //     <p>
-  //       Error:
-  //       {error instanceof Error ? error.message : "An unknown error occurred."}
-  //     </p>
-  //   );
-  // }
 
   return (
     <>
@@ -102,7 +99,7 @@ export const Board: React.FC = () => {
             gap={4}
           >
             <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
-              <LockOutlinedIcon />
+              <CakeIcon />
             </Avatar>
             <Typography component="h1" variant="h5" color="light">
               Celebrating Birthday Today
@@ -121,13 +118,9 @@ export const Board: React.FC = () => {
                   <Tooltip title="Wish Happy Birth Day">
                     <IconButton
                       color="primary"
-                      onClick={() =>
-                        window.open(
-                          `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.name}!`
-                        )
-                      }
+                      onClick={() => handleOpenWishDialog(row.original.email)}
                     >
-                      <CakeIcon />
+                      <MailIcon />
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -137,6 +130,12 @@ export const Board: React.FC = () => {
           </Box>
         </Container>
       )}
+
+      <WishHappyBirthdayDialog
+        open={openWishDialog}
+        handleClose={handleCloseWishDialog}
+        email={recipientEmail}
+      />
     </>
   );
 };
