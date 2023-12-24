@@ -17,6 +17,7 @@ export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+  const [name, setName] = React.useState<string>("");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -52,6 +53,22 @@ export default function AccountMenu() {
     }
   };
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("fetching data...");
+        const {
+          data: { name },
+        } = await client.get(`employee/me`);
+        setName(name);
+      } catch (error) {
+        console.error(`Error fetching employees with birthdays`, error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <React.Fragment>
       <Box
@@ -71,11 +88,11 @@ export default function AccountMenu() {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+            <Avatar sx={{ width: 32, height: 32 }}>{name[0]}</Avatar>
           </IconButton>
         </Tooltip>
         <Typography sx={{ minWidth: 100, color: "white" }}>
-          Hello name
+          Hello {name}
         </Typography>
       </Box>
       <Menu
