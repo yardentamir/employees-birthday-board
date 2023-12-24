@@ -129,12 +129,6 @@ export default function SignUp() {
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
                   format="dd/MM/yyyy"
-                  // value={selectedDay}
-                  // onChange={(newValue) => {
-                  //     setSelectedDay(newValue)
-                  // }}
-                  // remove slotProps to remove customization
-
                   slotProps={{
                     textField: {
                       fullWidth: true,

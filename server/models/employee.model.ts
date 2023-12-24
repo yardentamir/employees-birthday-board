@@ -78,6 +78,14 @@ employeeSchema.methods.toJSON = function () {
   delete userObject.tokens;
   delete userObject.__v;
 
+  // userObject.birthDate = format(
+  //   this.birthDate,
+  //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx",
+  //   {
+  //     timeZone: "Your/Timezone", // Replace with your desired timezone
+  //   }
+  // );
+
   return userObject;
 };
 
@@ -120,6 +128,11 @@ employeeSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 8);
   }
+
+  // Parse birthDate with the provided timezone
+  // this.birthDate = parse(this.birthDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSSxxx', {
+  //   timeZone: 'Your/Timezone', // Replace with the desired timezone
+  // });
 
   next();
 });
