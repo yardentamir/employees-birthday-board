@@ -1,5 +1,6 @@
 import { Close as CloseIcon } from "@mui/icons-material";
-import { Alert, Button, Grid, IconButton } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { Alert, Grid, IconButton } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -17,6 +18,8 @@ export interface IWishProps {
 
 export default function FormDialog({ open, handleClose, email }: IWishProps) {
   const [error, setError] = useState<string | null>(null);
+  const [isWish, setIsWish] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,12 +30,16 @@ export default function FormDialog({ open, handleClose, email }: IWishProps) {
       message: data.get("wish"),
     });
 
+    resetDialog();
+    setLoading(true);
+
     try {
       await client.post(`employee/logBirthdayWish`, {
         email: data.get("email"),
         message: data.get("wish"),
       });
       console.log("wished happy birthday");
+      setIsWish(true);
     } catch (err) {
       console.error(err);
       if (err instanceof Error) {
@@ -40,14 +47,25 @@ export default function FormDialog({ open, handleClose, email }: IWishProps) {
       } else {
         setError("Something went wrong. Please try again");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
+  const closeAndResetDialog = () => {
+    resetDialog();
+    handleClose();
+  };
+  const resetDialog = () => {
+    setError(null);
+    setIsWish(false);
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={closeAndResetDialog}>
       <DialogTitle>
         Wish Happy Birthday
-        <IconButton onClick={handleClose} style={{ float: "right" }}>
+        <IconButton onClick={closeAndResetDialog} style={{ float: "right" }}>
           <CloseIcon color="primary"></CloseIcon>
         </IconButton>{" "}
       </DialogTitle>
@@ -88,12 +106,22 @@ export default function FormDialog({ open, handleClose, email }: IWishProps) {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" fullWidth variant="contained">
+              <LoadingButton
+                type="submit"
+                loading={loading}
+                fullWidth
+                variant="contained"
+              >
                 Send
-              </Button>
+              </LoadingButton>
             </Grid>
             <Grid item xs={12}>
               {error && <Alert severity="error">{error}</Alert>}
+              {isWish && (
+                <Alert severity="success">
+                  Successfully wished happy birthday
+                </Alert>
+              )}
             </Grid>
           </Grid>
         </DialogContent>
