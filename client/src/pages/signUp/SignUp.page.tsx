@@ -1,8 +1,8 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { Alert } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
@@ -35,9 +35,13 @@ const Copyright: React.FC<TypographyProps> = (props) => {
 export default function SignUp() {
   const navigate = useNavigate();
   const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
+    setLoading(true);
+
     const data = new FormData(event.currentTarget);
 
     console.log({
@@ -73,6 +77,8 @@ export default function SignUp() {
       } else {
         setError("Something went wrong. Please try again");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -143,14 +149,15 @@ export default function SignUp() {
               </LocalizationProvider>
             </Grid>
           </Grid>
-          <Button
+          <LoadingButton
             type="submit"
             fullWidth
+            loading={loading}
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Sign Up
-          </Button>
+          </LoadingButton>
           <Grid container sx={{ mb: 2 }}>
             <Grid item>
               <Link href="/login" variant="body2">

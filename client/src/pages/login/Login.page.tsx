@@ -1,9 +1,9 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Alert,
   Avatar,
   Box,
-  Button,
   Container,
   Grid,
   Link,
@@ -35,9 +35,12 @@ const Copyright: FC<TypographyProps> = (props) => {
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
+    setLoading(true);
     try {
       const data = new FormData(event.currentTarget);
       const response: AxiosResponse = await client.post(`employee/login`, {
@@ -47,13 +50,15 @@ const SignIn: React.FC = () => {
 
       Cookies.set("accessToken", response.data.token);
       navigate("/board");
-    } catch (err: unknown) {
+    } catch (err) {
       console.error(err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("Something went wrong. Please try again");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,14 +99,15 @@ const SignIn: React.FC = () => {
             id="password"
             autoComplete="current-password"
           />
-          <Button
+          <LoadingButton
             type="submit"
             fullWidth
+            loading={loading}
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
-          </Button>
+          </LoadingButton>
           <Grid container sx={{ mb: 2 }}>
             <Grid item>
               <Link href="/signUp" variant="body2">
