@@ -1,7 +1,10 @@
 import { RequestHandler } from "express";
 import validator from "validator";
 import { AuthRequest } from "../middleware/auth";
-import employeeModel from "../models/employee.model";
+import {
+  default as Employee,
+  default as employeeModel,
+} from "../models/employee.model";
 import BirthdayService from "../service/birthday.service";
 import BirthdayWishService from "../service/birthdayWish.service";
 
@@ -111,10 +114,30 @@ export const logBirthdayWish: RequestHandler = async (
   res
 ) => {
   try {
-    const { recipientId, message } = req.body;
+    const { email, message } = req.body;
 
-    if (!recipientId || !message) {
+    if (!email || !message) {
       res.status(400).json({ error: "email and message are required" });
+      return;
+    }
+
+    if (req.employee) {
+      const employee = await Employee.findOne({ email });
+      if (employee) {
+        const senderId = req.employee._id;
+        const recipientId = employee._id;
+        const loggedWish = await BirthdayWishService.logBirthdayWish(
+          senderId,
+          recipientId,
+          message
+        );
+        res.status(200).json(loggedWish);
+      } else {
+        res.status(400).json({ error: "email and message are required" });
+        return;
+      }
+    } else {
+      res.status(401).json({ error: "Unauthorized" });
     }
   } catch (error) {
     console.log(error);
