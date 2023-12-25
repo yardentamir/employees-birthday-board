@@ -98,8 +98,6 @@ employeeSchema.methods.generateAuthToken = async function () {
     expiresIn: "2 days",
   });
 
-  console.log("generateAuthToken");
-
   this.tokens = this.tokens.concat({ token });
   await this.save();
 
@@ -110,15 +108,13 @@ employeeSchema.statics.findByCredentials = async (email, password) => {
   const employee = await Employee.findOne({ email });
 
   if (!employee) {
-    throw new Error("Unable to login");
+    throw new Error("There is no such user");
   }
 
   const isMatch = await bcrypt.compare(password, employee.password);
 
-  console.log("findByCredentials", isMatch, email, employee.password);
-
   if (!isMatch) {
-    throw new Error("Unable to login");
+    throw new Error("Password is incorrect");
   }
 
   return employee;

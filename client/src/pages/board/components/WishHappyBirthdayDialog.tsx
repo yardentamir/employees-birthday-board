@@ -1,12 +1,12 @@
 import { Close as CloseIcon } from "@mui/icons-material";
-import { Button, Grid, IconButton } from "@mui/material";
+import { Alert, Button, Grid, IconButton } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import { Box } from "@mui/system";
-import { AxiosError } from "axios";
+import { useState } from "react";
 import client from "../../../services/client";
 
 export interface IWishProps {
@@ -15,28 +15,34 @@ export interface IWishProps {
   email: string;
 }
 
-const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  const data = new FormData(event.currentTarget);
+export default function FormDialog({ open, handleClose, email }: IWishProps) {
+  const [error, setError] = useState<string | null>(null);
 
-  console.log({
-    email: data.get("email"),
-    message: data.get("wish"),
-  });
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
 
-  try {
-    await client.post(`employee/logBirthdayWish`, {
+    console.log({
       email: data.get("email"),
       message: data.get("wish"),
     });
-    console.log("wished happy birthday");
-  } catch (error) {
-    const axiosError = error as AxiosError;
-    console.error("Login failed:", axiosError.message);
-  }
-};
 
-export default function FormDialog({ open, handleClose, email }: IWishProps) {
+    try {
+      await client.post(`employee/logBirthdayWish`, {
+        email: data.get("email"),
+        message: data.get("wish"),
+      });
+      console.log("wished happy birthday");
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again");
+      }
+    }
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
@@ -85,6 +91,9 @@ export default function FormDialog({ open, handleClose, email }: IWishProps) {
               <Button type="submit" fullWidth variant="contained">
                 Send
               </Button>
+            </Grid>
+            <Grid item xs={12}>
+              {error && <Alert severity="error">{error}</Alert>}
             </Grid>
           </Grid>
         </DialogContent>

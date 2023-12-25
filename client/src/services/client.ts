@@ -22,35 +22,35 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-class BadRequestError extends Error {
+export class BadRequestError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "BadRequestError";
   }
 }
 
-class UnauthorizedError extends Error {
+export class UnauthorizedError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "UnauthorizedError";
   }
 }
 
-class NotFoundError extends Error {
+export class NotFoundError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "NotFoundError";
   }
 }
 
-class ConflictError extends Error {
+export class ConflictError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ConflictError";
   }
 }
 
-class TooManyRequestsError extends Error {
+export class TooManyRequestsError extends Error {
   constructor() {
     super("Too Many Requests");
     this.name = "TooManyRequestsError";
@@ -62,7 +62,6 @@ client.interceptors.response.use(
   (error) => {
     if (isAxiosError(error)) {
       const errorMessage = error.response?.data?.error;
-
       switch (error.response?.status) {
         case 400:
           throw new BadRequestError(errorMessage);

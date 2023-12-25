@@ -1,4 +1,5 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Alert } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -9,7 +10,7 @@ import TextField from "@mui/material/TextField";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { parse } from "date-fns";
 import Cookies from "js-cookie";
 import * as React from "react";
@@ -33,6 +34,7 @@ const Copyright: React.FC<TypographyProps> = (props) => {
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const [error, setError] = React.useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -64,16 +66,15 @@ export default function SignUp() {
       });
       Cookies.set("accessToken", response.data.token);
       navigate("/board");
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      console.error("Login failed:", axiosError.message);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again");
+      }
     }
   };
-
-  // React.useEffect(() => {
-  //   const token: string | undefined = Cookies.get("accessToken");
-  //   if (token) navigate("/board");
-  // }, [navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -150,13 +151,14 @@ export default function SignUp() {
           >
             Sign Up
           </Button>
-          <Grid container>
+          <Grid container sx={{ mb: 2 }}>
             <Grid item>
               <Link href="/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>
           </Grid>
+          {error && <Alert severity="error">{error}</Alert>}
         </Box>
       </Box>
       <Copyright sx={{ mt: 5 }} />

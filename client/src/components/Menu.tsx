@@ -1,4 +1,5 @@
 import Logout from "@mui/icons-material/Logout";
+import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -56,13 +57,12 @@ export default function AccountMenu() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("fetching data...");
         const {
           data: { name },
         } = await client.get(`employee/me`);
         setName(name);
       } catch (error) {
-        console.error(`Error fetching employees with birthdays`, error);
+        console.error(error);
       }
     };
 
@@ -105,6 +105,12 @@ export default function AccountMenu() {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         color="main"
       >
+        <MenuItem onClick={() => navigate("/login")}>
+          <ListItemIcon>
+            <SwitchAccountIcon fontSize="small" />
+          </ListItemIcon>
+          Switch Account
+        </MenuItem>
         <MenuItem onClick={handleLogOut}>
           <ListItemIcon>
             <Logout fontSize="small" />

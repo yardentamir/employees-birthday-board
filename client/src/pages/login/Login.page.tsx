@@ -1,5 +1,6 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -10,9 +11,9 @@ import {
   Typography,
   TypographyProps,
 } from "@mui/material";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
-import { FC, FormEvent, useEffect } from "react";
+import { FC, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import client from "../../services/client";
 
@@ -33,6 +34,7 @@ const Copyright: FC<TypographyProps> = (props) => {
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,16 +47,15 @@ const SignIn: React.FC = () => {
 
       Cookies.set("accessToken", response.data.token);
       navigate("/board");
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      console.error("Login failed:", axiosError.message);
+    } catch (err: unknown) {
+      console.error(err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again");
+      }
     }
   };
-
-  useEffect(() => {
-    const token: string | undefined = Cookies.get("accessToken");
-    if (token) navigate("/board");
-  }, [navigate]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -98,17 +99,17 @@ const SignIn: React.FC = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            // onClick={dispatch(fetchEmployees("h"))}
           >
             Sign In
           </Button>
-          <Grid container>
+          <Grid container sx={{ mb: 2 }}>
             <Grid item>
               <Link href="/signUp" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
           </Grid>
+          {error && <Alert severity="error">{error}</Alert>}
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
