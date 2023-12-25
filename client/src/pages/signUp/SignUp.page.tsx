@@ -11,7 +11,7 @@ import Typography, { TypographyProps } from "@mui/material/Typography";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { AxiosResponse } from "axios";
-import { parse } from "date-fns";
+import { format, parse } from "date-fns";
 import Cookies from "js-cookie";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,30 +43,25 @@ export default function SignUp() {
     setLoading(true);
 
     const data = new FormData(event.currentTarget);
-
-    console.log({
-      name: data.get("fullName"),
-      email: data.get("email"),
-      password: data.get("password"),
-      birthDate: data.get("birthDate"),
-    });
-
     const birthDate: string | undefined = data.get("birthDate")?.toString();
+
     try {
       if (
         !data.get("fullName") ||
+        !birthDate ||
         !data.get("email") ||
-        !data.get("password") ||
-        !birthDate
+        !data.get("password")
       ) {
         throw new Error("all the fields are required");
       }
-      console.log("date", parse(birthDate, "dd/MM/yyyy", new Date()));
+      const parsedDate = parse(birthDate, "dd/MM/yyyy", new Date());
+
       const response: AxiosResponse = await client.post(`employee/signup`, {
         name: data.get("fullName"),
         email: data.get("email"),
         password: data.get("password"),
-        birthDate: parse(birthDate, "dd/MM/yyyy", new Date()),
+        birthDate: format(parsedDate, "yyyy-MM-dd"),
+        timezone: sessionStorage.getItem("userTimezone"),
       });
       Cookies.set("accessToken", response.data.token);
       navigate("/board");

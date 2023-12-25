@@ -16,6 +16,7 @@ export interface IEmployee extends Omit<Document, "toJSON"> {
   email: string;
   password: string;
   birthDate: Date;
+  timeZone: string;
   receivedWishes: Types.ObjectId[];
   tokens: { token: string }[];
   toJSON: () => Omit<this, "password" | "tokens">;
@@ -53,6 +54,7 @@ const employeeSchema = new Schema(
       // },
     },
     birthDate: { type: Date, required: true },
+    timezone: { type: String },
     receivedWishes: [
       {
         type: Schema.Types.ObjectId,

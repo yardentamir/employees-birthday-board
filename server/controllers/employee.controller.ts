@@ -12,6 +12,10 @@ export const signup: RequestHandler = async (req, res) => {
   try {
     const employeeBody = req.body;
 
+    const dateStr = new Date(req.body.birthDate).toUTCString();
+    const date = new Date(dateStr);
+    req.body.birthDate = date;
+
     const employee = new employeeModel(employeeBody);
     const token = await employee.generateAuthToken();
 
