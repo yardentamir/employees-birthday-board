@@ -10,7 +10,7 @@ let myUrl = "http://localhost:5000/";
 
 console.log(import.meta.env.MODE);
 
-if (import.meta.env.MODE === "production") {
+if (import.meta.env.PROD) {
   myUrl = "https://employees-birthday-board.onrender.com/";
 }
 
