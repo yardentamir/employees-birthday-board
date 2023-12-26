@@ -10,7 +10,10 @@ import BirthdayWishService from "../service/birthdayWish.service";
 
 export const signup: RequestHandler = async (req, res) => {
   try {
+    req.body.timezone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
     const employeeBody = req.body;
+
+    req.log.info({ body: employeeBody }, "signup Body");
 
     const employee = new employeeModel(employeeBody);
     const token = await employee.generateAuthToken();

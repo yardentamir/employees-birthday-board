@@ -18,7 +18,6 @@ export interface IEmployee extends Omit<Document, "toJSON"> {
   email: string;
   password: string;
   birthDate: Date;
-  timeZone: string;
   receivedWishes: Types.ObjectId[];
   tokens: { token: string }[];
   toJSON: () => Omit<this, "password" | "tokens">;
@@ -49,11 +48,6 @@ const employeeSchema = new Schema(
       minlength: 8,
       required: true,
       trim: true,
-      // validate(value: string) {
-      //   if (validator.isStrongPassword(value)) {
-      //     throw new Error("Not a strong password");
-      //   }
-      // },
     },
     birthDate: { type: Date, required: true },
     receivedWishes: [
@@ -140,25 +134,6 @@ employeeSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 8);
   }
-
-  const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  logger.debug(
-    { birthDate: this.birthDate.toISOString(), timeZone },
-    "Original UTC date"
-  );
-
-  const adjustedDate = this.birthDate.toLocaleString("en-US", { timeZone });
-  const parsedBirthDateToStr = Date.parse(adjustedDate);
-  const strBirthDateToDate = new Date(parsedBirthDateToStr);
-
-  logger.debug(
-    { adjustedDate, strBirthDateToDate: strBirthDateToDate.toString() },
-    "Converted birth Date"
-  );
-  logger.debug({ strBirthDateToDate }, "Employee saved with birth Date");
-
-  this.birthDate = strBirthDateToDate;
 
   next();
 });
