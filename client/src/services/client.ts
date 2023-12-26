@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, isAxiosError } from "axios";
-
 import Cookies from "js-cookie";
 
 const getAuthorizationHeader = () => {
@@ -7,10 +6,14 @@ const getAuthorizationHeader = () => {
   return token ? `Bearer ${token}` : "";
 };
 
-const baseURL = "http://localhost:5000";
+let myUrl = "http://localhost:5000/";
+
+if (import.meta.env.MODE === "production") {
+  myUrl = "https://final-project-appleseeds-back.onrender.com/";
+}
 
 const client: AxiosInstance = axios.create({
-  baseURL,
+  baseURL: myUrl,
   headers: {
     "Content-Type": "application/json",
     Authorization: getAuthorizationHeader(),
