@@ -5,7 +5,7 @@ import express, { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import "./database/mongodb";
 import Employee from "./models/employee.model";
-import employeeRoutes from "./routes/employee.route";
+import employeeRoutes from "./routes/employee.routes";
 
 const { PORT } = cleanEnv(process.env, {
   PORT: port(),

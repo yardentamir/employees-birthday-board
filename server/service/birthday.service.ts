@@ -1,10 +1,9 @@
 import Employee, { IEmployee } from "../models/employee.model";
 
 class BirthdayService {
-  static async getEmployeesWithBirthdaysToday(): Promise<IEmployee[]> {
+  public static async getEmployeesWithBirthdaysToday(): Promise<IEmployee[]> {
     try {
       const currentDate = new Date();
-
       const currentMonth = currentDate.getMonth() + 1;
       const currentDay = currentDate.getDate();
 

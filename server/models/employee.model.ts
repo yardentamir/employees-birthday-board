@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { format } from "date-fns-tz";
 import { cleanEnv, str } from "envalid";
 import jwt from "jsonwebtoken";
 import {
@@ -54,7 +55,6 @@ const employeeSchema = new Schema(
       // },
     },
     birthDate: { type: Date, required: true },
-    timezone: { type: String },
     receivedWishes: [
       {
         type: Schema.Types.ObjectId,
@@ -80,13 +80,20 @@ employeeSchema.methods.toJSON = function () {
   delete userObject.tokens;
   delete userObject.__v;
 
-  // userObject.birthDate = format(
-  //   this.birthDate,
-  //   "yyyy-MM-dd'T'HH:mm:ss.SSSxxx",
-  //   {
-  //     timeZone: "Your/Timezone", // Replace with your desired timezone
-  //   }
-  // );
+  const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  userObject.birthDate = format(
+    this.birthDate,
+    "yyyy-MM-dd'T'HH:mm:ss.SSSxxx",
+    { timeZone: "US/Alaska" }
+  );
+
+  console.log(
+    "toJSON",
+    format(this.birthDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx", {
+      timeZone,
+    })
+  );
 
   return userObject;
 };
@@ -127,10 +134,17 @@ employeeSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 8);
   }
 
-  // Parse birthDate with the provided timezone
-  // this.birthDate = parse(this.birthDate, 'yyyy-MM-dd\'T\'HH:mm:ss.SSSxxx', {
-  //   timeZone: 'Your/Timezone', // Replace with the desired timezone
-  // });
+  const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  console.debug("Original UTC date:", this.birthDate.toISOString(), timeZone);
+
+  const adjustedDate = this.birthDate.toLocaleString("en-US", { timeZone });
+  const parsedBirthDateToStr = Date.parse(adjustedDate);
+  const strBirthDateToDate = new Date(parsedBirthDateToStr);
+
+  console.debug("Converted date:", adjustedDate, strBirthDateToDate.toString());
+
+  this.birthDate = strBirthDateToDate;
 
   next();
 });

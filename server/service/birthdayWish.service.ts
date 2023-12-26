@@ -3,7 +3,7 @@ import BirthdayWish, { IBirthdayWish } from "../models/birthdayWish.model";
 import Employee, { IEmployee } from "../models/employee.model";
 
 class BirthdayWishService {
-  static async logBirthdayWish(
+  public static async logBirthdayWish(
     senderId: Types.ObjectId,
     recipientId: Types.ObjectId,
     message: string
@@ -30,7 +30,7 @@ class BirthdayWishService {
     }
   }
 
-  static async getEmployeesWithWishes(): Promise<{
+  public static async getEmployeesWithWishes(): Promise<{
     employees: IEmployee[];
     count: number;
   }> {

@@ -12,10 +12,6 @@ export const signup: RequestHandler = async (req, res) => {
   try {
     const employeeBody = req.body;
 
-    const dateStr = new Date(req.body.birthDate).toUTCString();
-    const date = new Date(dateStr);
-    req.body.birthDate = date;
-
     const employee = new employeeModel(employeeBody);
     const token = await employee.generateAuthToken();
 
@@ -130,6 +126,12 @@ export const logBirthdayWish: RequestHandler = async (
       if (employee) {
         const senderId = req.employee._id;
         const recipientId = employee._id;
+        if (senderId.equals(recipientId)) {
+          res.status(400).json({
+            error: "Don't be silly, you can't wish happy birthday to yourself",
+          });
+          return;
+        }
         const loggedWish = await BirthdayWishService.logBirthdayWish(
           senderId,
           recipientId,
