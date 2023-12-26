@@ -52,7 +52,7 @@ export default function SignUp() {
         !data.get("email") ||
         !data.get("password")
       ) {
-        throw new Error("all the fields are required");
+        throw new Error("All the fields are required");
       }
       const parsedDate = parse(birthDate, "dd/MM/yyyy", new Date());
 

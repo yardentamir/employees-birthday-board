@@ -1,5 +1,6 @@
 import { cleanEnv, str } from "envalid";
 import { connect, connection as db } from "mongoose";
+import logger from "../middleware/logger";
 
 const { MONGODB_URL } = cleanEnv(process.env, {
   MONGODB_URL: str(),
@@ -7,7 +8,7 @@ const { MONGODB_URL } = cleanEnv(process.env, {
 
 connect(MONGODB_URL);
 
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
+db.on("error", logger.error.bind(logger, "MongoDB connection error:"));
 db.once("open", () => {
-  console.log("Connected to MongoDB");
+  logger.info("MongoDB connection successful.");
 });

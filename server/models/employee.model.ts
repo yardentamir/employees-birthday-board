@@ -11,6 +11,7 @@ import {
   model,
 } from "mongoose";
 import validator from "validator";
+import logger from "../middleware/logger";
 
 export interface IEmployee extends Omit<Document, "toJSON"> {
   name: string;
@@ -82,17 +83,20 @@ employeeSchema.methods.toJSON = function () {
 
   const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  userObject.birthDate = format(
+  const birthDateWithTimeZone = format(
     this.birthDate,
     "yyyy-MM-dd'T'HH:mm:ss.SSSxxx",
-    { timeZone: "US/Alaska" }
+    { timeZone }
   );
 
-  console.log(
-    "toJSON",
-    format(this.birthDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx", {
-      timeZone,
-    })
+  userObject.birthDate = birthDateWithTimeZone;
+
+  logger.info(
+    {
+      birthDateWithTimeZone,
+      birthDateUTC: this.birthDate,
+    },
+    "Convert Birth Date to client"
   );
 
   return userObject;
@@ -108,6 +112,7 @@ employeeSchema.methods.generateAuthToken = async function () {
   });
 
   this.tokens = this.tokens.concat({ token });
+  logger.info({ userId: this._id }, "Generated Auth Token for user");
   await this.save();
 
   return token;
@@ -117,12 +122,14 @@ employeeSchema.statics.findByCredentials = async (email, password) => {
   const employee = await Employee.findOne({ email });
 
   if (!employee) {
+    logger.error({ userEmail: email }, "User not found for email");
     throw new Error("There is no such user");
   }
 
   const isMatch = await bcrypt.compare(password, employee.password);
 
   if (!isMatch) {
+    logger.error({ userEmail: email }, "Incorrect password for user");
     throw new Error("Password is incorrect");
   }
 
@@ -136,13 +143,20 @@ employeeSchema.pre("save", async function (next) {
 
   const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  console.debug("Original UTC date:", this.birthDate.toISOString(), timeZone);
+  logger.debug(
+    { birthDate: this.birthDate.toISOString(), timeZone },
+    "Original UTC date"
+  );
 
   const adjustedDate = this.birthDate.toLocaleString("en-US", { timeZone });
   const parsedBirthDateToStr = Date.parse(adjustedDate);
   const strBirthDateToDate = new Date(parsedBirthDateToStr);
 
-  console.debug("Converted date:", adjustedDate, strBirthDateToDate.toString());
+  logger.debug(
+    { adjustedDate, strBirthDateToDate: strBirthDateToDate.toString() },
+    "Converted birth Date"
+  );
+  logger.debug({ strBirthDateToDate }, "Employee saved with birth Date");
 
   this.birthDate = strBirthDateToDate;
 

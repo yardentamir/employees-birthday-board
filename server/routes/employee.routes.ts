@@ -19,7 +19,7 @@ rootRouter.get("/employeesWithBirthdays", auth, c.loadEmployeesWithBirthdays);
 
 rootRouter.post("/logBirthdayWish", auth, c.logBirthdayWish);
 
-rootRouter.get("/loadEmployeesWithWishes", auth, c.loadEmployeesWithWishes);
+rootRouter.get("/loadEmployeesWithWishes", c.loadEmployeesWithWishes);
 
 rootRouter.get("/loadEmployees", c.loadEmployees);
 

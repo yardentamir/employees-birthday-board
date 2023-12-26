@@ -3,8 +3,9 @@ import "dotenv/config";
 import { cleanEnv, port } from "envalid";
 import express, { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
+import { pinoHttp } from "pino-http";
 import "./database/mongodb";
-import Employee from "./models/employee.model";
+import logger from "./middleware/logger";
 import employeeRoutes from "./routes/employee.routes";
 
 const { PORT } = cleanEnv(process.env, {
@@ -13,21 +14,18 @@ const { PORT } = cleanEnv(process.env, {
 
 const app = express();
 
+app.use(pinoHttp({ logger }));
 app.use(cors());
 app.use(express.json());
 
 app.use("/employee", employeeRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
+  const errorMessage = `404 - Page Not Found: ${req.method} ${req.url}`;
+  logger.error(errorMessage);
   next(createHttpError(404, "Page Not Found"));
 });
 
-app.get("/", async (req: Request, res: Response) => {
-  const employees = await Employee.find().exec();
-  res.status(200).json(employees);
-  res.send("MongoDB connection successful.");
-});
-
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  logger.info(`Server is running at http://localhost:${PORT}`);
 });

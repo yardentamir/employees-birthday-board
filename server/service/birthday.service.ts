@@ -1,8 +1,10 @@
+import logger from "../middleware/logger";
 import Employee, { IEmployee } from "../models/employee.model";
 
 class BirthdayService {
   public static async getEmployeesWithBirthdaysToday(): Promise<IEmployee[]> {
     try {
+      logger.info("Fetching employees with birthdays today");
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth() + 1;
       const currentDay = currentDate.getDate();
@@ -16,9 +18,14 @@ class BirthdayService {
         },
       });
 
+      logger.info(
+        { count: employeesWithBirthdays.length },
+        "Retrieved employees with birthdays today"
+      );
+
       return employeesWithBirthdays;
     } catch (error) {
-      console.error("Error retrieving employees with birthdays:", error);
+      logger.error({ error }, "Error retrieving employees with birthdays");
       throw error;
     }
   }
