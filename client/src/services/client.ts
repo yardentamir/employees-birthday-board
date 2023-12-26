@@ -9,7 +9,7 @@ const getAuthorizationHeader = () => {
 let myUrl = "http://localhost:5000/";
 
 if (import.meta.env.MODE === "production") {
-  myUrl = "https://final-project-appleseeds-back.onrender.com/";
+  myUrl = "https://employees-birthday-board.onrender.com/";
 }
 
 const client: AxiosInstance = axios.create({
@@ -60,6 +60,13 @@ export class TooManyRequestsError extends Error {
   }
 }
 
+export class InternalServerError extends Error {
+  constructor() {
+    super("Internal Server Error");
+    this.name = "InternalServerError";
+  }
+}
+
 client.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -75,6 +82,8 @@ client.interceptors.response.use(
         case 409:
           throw new ConflictError(errorMessage);
         case 429:
+          throw new InternalServerError();
+        case 500:
           throw new TooManyRequestsError();
         default:
           throw error;
