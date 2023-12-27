@@ -29,7 +29,7 @@ yarn install
   ```
 
 To run the server,
-open the terminal in the skyline-robotics-task file directory and run the command: 
+open the terminal in the employees-birthday-board directory and run the command: 
 ```
 yarn dev
   ```
