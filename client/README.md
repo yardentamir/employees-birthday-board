@@ -1,3 +1,29 @@
+# run on cloud
+
+Choose POST request and send a request to:
+```
+https://employees-birthday-board.netlify.app
+  ```
+
+# run locally
+
+First, You need to install all the dependencies, to do that run the command below in the terminal:
+```
+yarn install
+  ```
+
+To run the server,
+open the terminal and run the command: 
+```
+yarn dev
+  ```
+  
+The server will run on: 
+```
+http://localhost:5173/
+  ```
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
