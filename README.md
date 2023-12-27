@@ -1,7 +1,8 @@
 # employees-birthday-board
 
 [https://employees-birthday-board.netlify.app](https://employees-birthday-board.netlify.app)
-employees birthday board - see who has birthday and send them happy birthday
+
+employees' birthday board - see who has a birthday and send them a happy birthday
 
 ## Routs
 
