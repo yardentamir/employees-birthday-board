@@ -1,7 +1,7 @@
 # run on cloud
 
 ```
-[https://skyline-robotics-task.herokuapp.com](https://employees-birthday-board.onrender.com/)
+https://skyline-robotics-task.herokuapp.com
   ```
 
 # run on docker
