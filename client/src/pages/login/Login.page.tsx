@@ -110,7 +110,7 @@ const SignIn: React.FC = () => {
           </LoadingButton>
           <Grid container sx={{ mb: 2 }}>
             <Grid item>
-              <Link href="/signUp" variant="body2">
+              <Link href="/#/signUp" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

@@ -155,7 +155,7 @@ export default function SignUp() {
           </LoadingButton>
           <Grid container sx={{ mb: 2 }}>
             <Grid item>
-              <Link href="/login" variant="body2">
+              <Link href="/#/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>
