@@ -1,6 +1,6 @@
 import { cleanEnv, str } from "envalid";
 import { connect, connection as db } from "mongoose";
-import logger from "../middleware/logger";
+import logger from "../utils/logger.util";
 
 const { MONGODB_URL } = cleanEnv(process.env, {
   MONGODB_URL: str(),

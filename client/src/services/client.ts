@@ -6,12 +6,12 @@ const getAuthorizationHeader = () => {
   return token ? `Bearer ${token}` : "";
 };
 
-let myUrl = "http://localhost:5000/";
+let myUrl = import.meta.env.URL_DEV;
 
 console.log(import.meta.env.MODE);
 
 if (import.meta.env.PROD) {
-  myUrl = "https://employees-birthday-board.onrender.com/";
+  myUrl = import.meta.env.URL_PROD;
 }
 
 const client: AxiosInstance = axios.create({

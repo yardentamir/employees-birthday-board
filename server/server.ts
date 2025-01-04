@@ -5,7 +5,7 @@ import express, { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import { pinoHttp } from "pino-http";
 import "./database/mongodb";
-import logger from "./middleware/logger";
+import logger from "./utils/logger.util";
 import employeeRoutes from "./routes/employee.routes";
 
 const { PORT } = cleanEnv(process.env, {
