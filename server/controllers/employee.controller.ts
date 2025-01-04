@@ -94,23 +94,16 @@ export const loadEmployees: RequestHandler = async (req, res) => {
 
 export const logOut: RequestHandler = async function (req, res) {
   try {
-    if (req.employee) {
-      req.employee.tokens = req.employee.tokens.filter((token) => {
-        return token.token !== req.token;
-      });
-      await req.employee.save();
+    req.employee.tokens = req.employee.tokens.filter((token) => {
+      return token.token !== req.token;
+    });
+    await req.employee.save();
 
-      req.log.info(
-        { employeeId: req.employee._id },
-        LOG_MESSAGES.AUTH.SUCCSESSFUL_LOGOUT
-      );
-      res.status(RESPONSE.SUCCESS.STATUS).send(RESPONSE.SUCCESS.LOGIN);
-    } else {
-      req.log.warn(LOG_MESSAGES.AUTH.UNAUTHORIZED_ATTEMPT);
-      res
-        .status(RESPONSE.UNAUTHORIZED.STATUS)
-        .json({ error: RESPONSE.UNAUTHORIZED.MESSAGE });
-    }
+    req.log.info(
+      { employeeId: req.employee._id },
+      LOG_MESSAGES.AUTH.SUCCSESSFUL_LOGOUT
+    );
+    res.status(RESPONSE.SUCCESS.STATUS).send(RESPONSE.SUCCESS.LOGIN);
   } catch (error) {
     req.log.error({ error }, LOG_MESSAGES.AUTH.LOGOUT_FAILED);
     if (error instanceof Error) {
@@ -167,36 +160,29 @@ export const logBirthdayWish: RequestHandler = async (req, res) => {
       return;
     }
 
-    if (req.employee) {
-      const employee = await Employee.findOne({ email });
-      if (employee) {
-        const senderId = req.employee._id as mongoose.Types.ObjectId;
-        const recipientId = employee._id as mongoose.Types.ObjectId;
-        if (senderId.equals(recipientId)) {
-          res.status(RESPONSE.BAD_REQUEST.STATUS).json({
-            error: RESPONSE.BAD_REQUEST.SELF_WISH,
-          });
-          req.log.warn(LOG_MESSAGES.WISHS.SELF_WISH);
-          return;
-        }
-        const loggedWish = await BirthdayWishService.logBirthdayWish(
-          senderId,
-          recipientId,
-          message
-        );
-        res.status(RESPONSE.SUCCESS.STATUS).json(loggedWish);
-        req.log.info(LOG_MESSAGES.WISHS.SUCCESSFUL_WISH);
-      } else {
-        res
-          .status(RESPONSE.BAD_REQUEST.STATUS)
-          .json({ error: RESPONSE.BAD_REQUEST.REQUIRED_LOGIN });
+    const employee = await Employee.findOne({ email });
+    if (employee) {
+      const senderId = req.employee._id as mongoose.Types.ObjectId;
+      const recipientId = employee._id as mongoose.Types.ObjectId;
+      if (senderId.equals(recipientId)) {
+        res.status(RESPONSE.BAD_REQUEST.STATUS).json({
+          error: RESPONSE.BAD_REQUEST.SELF_WISH,
+        });
+        req.log.warn(LOG_MESSAGES.WISHS.SELF_WISH);
         return;
       }
+      const loggedWish = await BirthdayWishService.logBirthdayWish(
+        senderId,
+        recipientId,
+        message
+      );
+      res.status(RESPONSE.SUCCESS.STATUS).json(loggedWish);
+      req.log.info(LOG_MESSAGES.WISHS.SUCCESSFUL_WISH);
     } else {
-      req.log.warn(LOG_MESSAGES.AUTH.LOGOUT_ALL_DEVICES_FAILED);
       res
-        .status(RESPONSE.UNAUTHORIZED.STATUS)
-        .json({ error: RESPONSE.UNAUTHORIZED.MESSAGE });
+        .status(RESPONSE.BAD_REQUEST.STATUS)
+        .json({ error: RESPONSE.BAD_REQUEST.REQUIRED_LOGIN });
+      return;
     }
   } catch (error) {
     console.log(error);

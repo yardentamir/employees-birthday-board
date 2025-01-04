@@ -7,7 +7,7 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "dev": "nodemon server.ts"
+    "dev": "tsx --watch ./server.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -20,8 +20,8 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "eslint": "^8.56.0",
-    "nodemon": "^3.0.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {

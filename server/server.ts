@@ -7,6 +7,7 @@ import { pinoHttp } from "pino-http";
 import "./database/mongodb";
 import logger from "./utils/logger.util";
 import employeeRoutes from "./routes/employee.routes";
+import RESPONSE from "./constants/response.constant";
 
 const { PORT } = cleanEnv(process.env, {
   PORT: port(),
@@ -21,9 +22,8 @@ app.use(express.json());
 app.use("/employee", employeeRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const errorMessage = `404 - Page Not Found: ${req.method} ${req.url}`;
-  logger.error(errorMessage);
-  next(createHttpError(404, "Page Not Found"));
+  logger.warn({ method: req.method, url: req.url }, RESPONSE.NOT_FOUND.MESSAGE);
+  next(createHttpError(RESPONSE.NOT_FOUND.STATUS, RESPONSE.NOT_FOUND.MESSAGE));
 });
 
 app.listen(PORT, () => {
