@@ -33,12 +33,6 @@ export const login: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      const errorMessage: string = RESPONSE.BAD_REQUEST.REQUIRED_LOGIN;
-      req.log.warn(errorMessage);
-      createHttpError(RESPONSE.BAD_REQUEST.STATUS, errorMessage);
-    }
-
     if (!validator.isEmail(email)) {
       const errorMessage: string = RESPONSE.BAD_REQUEST.INVALID_EMAIL;
       req.log.warn(errorMessage);
@@ -123,14 +117,6 @@ export const loadEmployeesWithBirthdays: RequestHandler = async (req, res) => {
 export const logBirthdayWish: RequestHandler = async (req, res) => {
   try {
     const { email, message } = req.body;
-
-    if (!email || !message) {
-      res
-        .status(RESPONSE.BAD_REQUEST.STATUS)
-        .json({ error: RESPONSE.BAD_REQUEST.REQUIRED_LOGIN });
-      req.log.warn(RESPONSE.BAD_REQUEST.REQUIRED_LOGIN);
-      return;
-    }
 
     const employee: null | IEmployeeDocument = await Employee.findOne({
       email,

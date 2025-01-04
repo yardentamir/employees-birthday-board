@@ -1,40 +1,275 @@
-# run on cloud
+# Employees Birthday Board API
+
+## Running server on Cloud
 
 ```
 https://employees-birthday-board.onrender.com
-  ```
+```
 
-# run on docker
+## Running client on Cloud
 
-To build docker image run the command below in the terminal:
+```
+https://employees-birthday-board.netlify.app/
+```
+
+## Run server on Docker
+
+### Build Docker Image
+
+Run the command below in the terminal:
+
 ```
 docker build --tag employees-birthday-board .
-  ```
+```
 
-To run docker container, run the command: 
+### Run Docker Container
+
+Run the command below to start the container:
+
 ```
 docker run -p 8000:5000 --name employees-birthday-board -d employees-birthday-board
-  ```
+```
 
-Server is up on:
+The server will be available at:
+
 ```
 http://localhost:5000/
-  ```
+```
 
-# run locally
+## Run code locally
 
-First, You need to install all the dependencies, to do that run the command below in the terminal:
+### Install Dependencies
+
+You can install the dependencies using either `yarn` or `npm`:
+
+#### Using Yarn
+
 ```
 yarn install
-  ```
+```
 
-To run the server,
-open the terminal in the employees-birthday-board directory and run the command: 
+#### Using npm
+
+```
+npm install
+```
+
+### Start the Server
+
+Open the terminal in the `employees-birthday-board` directory and run the following command:
+
+#### Using Yarn:
+
 ```
 yarn dev
-  ```
-  
-The server will run on: 
+```
+
+#### Using npm:
+
+```
+npm run dev
+```
+
+The server will run on:
+
 ```
 http://localhost:5000/
-  ```
+```
+
+## API Endpoints
+
+### 1. Sign Up
+
+**Endpoint:** `/signup`
+
+- **Method:** POST
+- **Description:** Create a new employee.
+
+#### Request Body:
+
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "birthDate": "1990-01-01"
+}
+```
+
+#### cURL:
+
+```
+curl -X POST \
+  https://employees-birthday-board.onrender.com/employee/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "password123",
+    "birthDate": "1990-01-01"
+  }'
+```
+
+---
+
+### 2. Login
+
+**Endpoint:** `/login`
+
+- **Method:** POST
+- **Description:** Login an employee.
+
+#### Request Body:
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+```
+
+#### cURL:
+
+```
+curl -X POST \
+  https://employees-birthday-board.onrender.com/employee/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "password": "password123"
+  }'
+```
+
+---
+
+### 3. Get Current User
+
+**Endpoint:** `/me`
+
+- **Method:** GET
+- **Description:** Get details of the currently authenticated employee.
+- **Authorization:** Bearer token required.
+
+#### cURL:
+
+```
+curl -X GET \
+  https://employees-birthday-board.onrender.com/employee/me \
+  -H "Authorization: Bearer <your-token>"
+```
+
+---
+
+### 4. Logout
+
+**Endpoint:** `/logOut`
+
+- **Method:** POST
+- **Description:** Logout the current user.
+- **Authorization:** Bearer token required.
+
+#### cURL:
+
+```
+curl -X POST \
+  https://employees-birthday-board.onrender.com/employee/logOut \
+  -H "Authorization: Bearer <your-token>"
+```
+
+---
+
+### 5. Logout from All Devices
+
+**Endpoint:** `/logOutAll`
+
+- **Method:** POST
+- **Description:** Logout the current user from all devices.
+- **Authorization:** Bearer token required.
+
+#### cURL:
+
+```
+curl -X POST \
+  https://employees-birthday-board.onrender.com/employee/logOutAll \
+  -H "Authorization: Bearer <your-token>"
+```
+
+---
+
+### 6. Load Employees with Birthdays
+
+**Endpoint:** `/employeesWithBirthdays`
+
+- **Method:** GET
+- **Description:** Get employees who have birthdays today.
+- **Authorization:** Bearer token required.
+
+#### cURL:
+
+```
+curl -X GET \
+  https://employees-birthday-board.onrender.com/employee/employeesWithBirthdays \
+  -H "Authorization: Bearer <your-token>"
+```
+
+---
+
+### 7. Log Birthday Wish
+
+**Endpoint:** `/logBirthdayWish`
+
+- **Method:** POST
+- **Description:** Log a birthday wish for an employee.
+- **Authorization:** Bearer token required.
+
+#### Request Body:
+
+```json
+{
+  "email": "recipient.email@example.com",
+  "message": "Happy Birthday!"
+}
+```
+
+#### cURL:
+
+```
+curl -X POST \
+  https://employees-birthday-board.onrender.com/employee/logBirthdayWish \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "recipient.email@example.com",
+    "message": "Happy Birthday!"
+  }'
+```
+
+---
+
+### 8. Load Employees with Wishes
+
+**Endpoint:** `/loadEmployeesWithWishes`
+
+- **Method:** GET
+- **Description:** Get employees along with their birthday wishes.
+
+#### cURL:
+
+```
+curl -X GET \ https://employees-birthday-board.onrender.com/employee/loadEmployeesWithWishes
+```
+
+---
+
+### 9. Load All Employees
+
+**Endpoint:** `/loadEmployees`
+
+- **Method:** GET
+- **Description:** Get all employees.
+
+#### cURL:
+
+```
+curl -X GET \ https://employees-birthday-board.onrender.com/loadEmployees
+```

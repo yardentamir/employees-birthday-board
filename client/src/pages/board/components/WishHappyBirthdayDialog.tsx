@@ -90,6 +90,7 @@ export default function FormDialog({ open, handleClose, email }: IWishProps) {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                inputProps={{ readOnly: true }}
                 defaultValue={email}
               />
             </Grid>

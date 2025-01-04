@@ -61,7 +61,6 @@ export default function SignUp() {
         email: data.get("email"),
         password: data.get("password"),
         birthDate: format(parsedDate, "yyyy-MM-dd"),
-        timezone: sessionStorage.getItem("userTimezone"),
       });
       Cookies.set("accessToken", response.data.token);
       navigate("/board");
