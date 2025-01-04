@@ -3,6 +3,8 @@ const RESPONSE = {
     STATUS: 200,
     MESSAGE: "Success",
     LOGIN: "log out successfully!",
+    LOGOUT: "log out successfully!",
+    LOGOUT_ALL: "log out from all devices successfully!",
   },
   BAD_REQUEST: {
     STATUS: 400,
@@ -28,6 +30,7 @@ const RESPONSE = {
   INTERNAL_SERVER_ERROR: {
     STATUS: 500,
     MESSAGE: "Internal Server Error",
+    UNKNOWN_MESSAGE: "Unknown Error",
   },
   RECORED_CREATED: {
     STATUS: 201,
