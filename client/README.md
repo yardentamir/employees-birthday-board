@@ -1,4 +1,6 @@
-# Run client on cloud
+# Employees Birthday Board Client
+
+## Running client on Cloud
 
 ```
 https://employees-birthday-board.netlify.app
