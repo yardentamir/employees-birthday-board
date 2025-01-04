@@ -49,8 +49,8 @@ export class ConflictError extends Error {
 }
 
 export class TooManyRequestsError extends Error {
-  constructor() {
-    super("Too Many Requests");
+  constructor(message: string) {
+    super(message);
     this.name = "TooManyRequestsError";
   }
 }
@@ -77,9 +77,9 @@ client.interceptors.response.use(
         case 409:
           throw new ConflictError(errorMessage);
         case 429:
-          throw new InternalServerError();
+          throw new TooManyRequestsError(errorMessage);
         case 500:
-          throw new TooManyRequestsError();
+          throw new InternalServerError();
         default:
           throw error;
       }
