@@ -1,28 +1,48 @@
-# run on cloud
+# Run client on cloud
 
-Choose POST request and send a request to:
 ```
 https://employees-birthday-board.netlify.app
-  ```
+```
 
-# run locally
+## Run code locally
 
-First, You need to install all the dependencies, to do that run the command below in the terminal:
+### Install Dependencies
+
+You can install the dependencies using either `yarn` or `npm`:
+
+#### Using Yarn
+
 ```
 yarn install
-  ```
+```
 
-To run the server,
-open the terminal and run the command: 
+#### Using npm
+
+```
+npm install
+```
+
+### Start the Client side
+
+Open the terminal in the this directory and run the following command:
+
+#### Using Yarn:
+
 ```
 yarn dev
-  ```
-  
-The server will run on: 
+```
+
+#### Using npm:
+
+```
+npm run dev
+```
+
+The Client side will run on:
+
 ```
 http://localhost:5173/
-  ```
-
+```
 
 # React + TypeScript + Vite
 
@@ -43,12 +63,12 @@ If you are developing a production application, we recommend updating the config
 export default {
   // other rules...
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
+    ecmaVersion: "latest",
+    sourceType: "module",
+    project: ["./tsconfig.json", "./tsconfig.node.json"],
     tsconfigRootDir: __dirname,
   },
-}
+};
 ```
 
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`

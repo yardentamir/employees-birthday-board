@@ -1,0 +1,25 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 100 100"
+  width="100"
+  height="100"
+>
+  <!-- Cake Base -->
+  <rect x="20" y="50" width="60" height="30" fill="#FFC0CB" />
+  <rect x="20" y="70" width="60" height="20" fill="#FF69B4" />
+  
+  <!-- Cake Top -->
+  <path
+    d="M20 50 Q35 30, 50 50 Q65 30, 80 50"
+    fill="#FFB6C1"
+  />
+  
+  <!-- Candle -->
+  <rect x="45" y="20" width="10" height="30" fill="#FFD700" />
+  
+  <!-- Flame -->
+  <path
+    d="M50 10 Q47 5, 50 0 Q53 5, 50 10"
+    fill="#FFA500"
+  />
+</svg>
