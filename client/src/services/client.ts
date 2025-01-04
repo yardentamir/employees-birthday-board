@@ -5,17 +5,10 @@ const getAuthorizationHeader = () => {
   const token = Cookies.get("accessToken");
   return token ? `Bearer ${token}` : "";
 };
-
-let myUrl = import.meta.env.URL_DEV;
-
 console.log(import.meta.env.MODE);
 
-if (import.meta.env.PROD) {
-  myUrl = import.meta.env.URL_PROD;
-}
-
 const client: AxiosInstance = axios.create({
-  baseURL: myUrl,
+  baseURL: import.meta.env.BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Authorization: getAuthorizationHeader(),
