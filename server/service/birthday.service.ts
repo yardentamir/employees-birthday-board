@@ -1,15 +1,17 @@
-import logger from "../middleware/logger";
-import Employee, { IEmployee } from "../models/employee.model";
+import logger from "../utils/logger.util";
+import Employee from "../models/employee.model";
+import { IEmployee, IEmployeeDocument } from "../types/employee.type";
+import LOG_MESSAGES from "../constants/logs.constant";
 
 class BirthdayService {
   public static async getEmployeesWithBirthdaysToday(): Promise<IEmployee[]> {
     try {
-      logger.info("Fetching employees with birthdays today");
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth() + 1;
-      const currentDay = currentDate.getDate();
+      logger.info(LOG_MESSAGES.EMPLOYEES.FETCH_WITH_BIRTHDAYS);
+      const currentDate: Date = new Date();
+      const currentMonth: number = currentDate.getMonth() + 1;
+      const currentDay: number = currentDate.getDate();
 
-      const employeesWithBirthdays = await Employee.find({
+      const employeesWithBirthdays: IEmployeeDocument[] = await Employee.find({
         $expr: {
           $and: [
             { $eq: [{ $month: "$birthDate" }, currentMonth] },
@@ -20,12 +22,15 @@ class BirthdayService {
 
       logger.info(
         { count: employeesWithBirthdays.length },
-        "Retrieved employees with birthdays today"
+        LOG_MESSAGES.EMPLOYEES.BIRTHDAY_TODAY
       );
 
       return employeesWithBirthdays;
     } catch (error) {
-      logger.error({ error }, "Error retrieving employees with birthdays");
+      logger.error(
+        { error },
+        LOG_MESSAGES.EMPLOYEES.FETCH_WITH_BIRTHDAYS_FAILED
+      );
       throw error;
     }
   }

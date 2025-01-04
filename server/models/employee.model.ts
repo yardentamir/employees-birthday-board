@@ -2,31 +2,12 @@ import bcrypt from "bcrypt";
 import { format } from "date-fns-tz";
 import { cleanEnv, str } from "envalid";
 import jwt from "jsonwebtoken";
-import {
-  Document,
-  InferSchemaType,
-  Model,
-  Schema,
-  Types,
-  model,
-} from "mongoose";
+import { InferSchemaType, Schema, model } from "mongoose";
 import validator from "validator";
-import logger from "../middleware/logger";
-
-export interface IEmployee extends Omit<Document, "toJSON"> {
-  name: string;
-  email: string;
-  password: string;
-  birthDate: Date;
-  receivedWishes: Types.ObjectId[];
-  tokens: { token: string }[];
-  toJSON: () => Omit<this, "password" | "tokens">;
-  generateAuthToken(): Promise<string>;
-}
-
-export interface EmployeeModel extends Model<IEmployee> {
-  findByCredentials(email: string, password: string): Promise<IEmployee>;
-}
+import logger from "../utils/logger.util";
+import LOG_MESSAGES from "../constants/logs.constant";
+import { DATE_FORMAT } from "../constants/format.constant";
+import { EmployeeModel, IEmployee } from "../types/employee.type";
 
 const employeeSchema = new Schema(
   {
@@ -75,13 +56,11 @@ employeeSchema.methods.toJSON = function () {
   delete userObject.tokens;
   delete userObject.__v;
 
-  const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeZone: string = new Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const birthDateWithTimeZone = format(
-    this.birthDate,
-    "yyyy-MM-dd'T'HH:mm:ss.SSSxxx",
-    { timeZone }
-  );
+  const birthDateWithTimeZone: string = format(this.birthDate, DATE_FORMAT, {
+    timeZone,
+  });
 
   userObject.birthDate = birthDateWithTimeZone;
 
@@ -90,7 +69,7 @@ employeeSchema.methods.toJSON = function () {
       birthDateWithTimeZone,
       birthDateUTC: this.birthDate,
     },
-    "Convert Birth Date to client"
+    LOG_MESSAGES.EMPLOYEES.CONVERTED_BIRTH_DATE
   );
 
   return userObject;
@@ -101,7 +80,7 @@ const { SECRET_KEY } = cleanEnv(process.env, {
 });
 
 employeeSchema.methods.generateAuthToken = async function () {
-  const token = jwt.sign({ _id: this._id.toString() }, SECRET_KEY, {
+  const token: string = jwt.sign({ _id: this._id.toString() }, SECRET_KEY, {
     expiresIn: "2 days",
   });
 
@@ -120,7 +99,7 @@ employeeSchema.statics.findByCredentials = async (email, password) => {
     throw new Error("There is no such user");
   }
 
-  const isMatch = await bcrypt.compare(password, employee.password);
+  const isMatch: boolean = await bcrypt.compare(password, employee.password);
 
   if (!isMatch) {
     logger.error({ userEmail: email }, "Incorrect password for user");

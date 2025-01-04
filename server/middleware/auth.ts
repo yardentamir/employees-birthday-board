@@ -1,38 +1,38 @@
 import { cleanEnv, str } from "envalid";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import Employee, { IEmployee } from "../models/employee.model";
+import Employee from "../models/employee.model";
+import CLIENT_RESPONSE from "../constants/response.constant";
+import LOG_MESSAGES from "../constants/logs.constant";
+import { IEmployeeDocument } from "../types/employee.type";
 const { SECRET_KEY } = cleanEnv(process.env, {
   SECRET_KEY: str(),
 });
 
-export interface AuthRequest extends Request {
-  token?: string;
-  employee?: IEmployee;
-}
-
-const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const authorizationHeader = req.headers["authorization"];
+const auth = async (req: Request, res: Response, next: NextFunction) => {
+  const authorizationHeader: string | undefined = req.headers["authorization"];
 
   if (!authorizationHeader) {
     res
-      .status(401)
-      .json({ error: "You're not connected, please authenticate" });
+      .status(CLIENT_RESPONSE.UNAUTHORIZED.STATUS)
+      .json({ error: CLIENT_RESPONSE.UNAUTHORIZED.REQUIRED_AUTHENTICATION });
+    req.log.error(LOG_MESSAGES.AUTH.MISSING_AUTH_TOKEN);
     return;
   }
 
-  const token = authorizationHeader.replace("Bearer ", "");
+  const token: string = authorizationHeader.replace("Bearer ", "");
 
-  const decoded = jwt.verify(token, SECRET_KEY) as { _id: string };
-  const employee = await Employee.findOne({
-    _id: decoded._id,
+  const decoded: string | jwt.JwtPayload = jwt.verify(token, SECRET_KEY);
+  const employee: null | IEmployeeDocument = await Employee.findOne({
+    _id: decoded,
     "tokens.token": token,
   });
 
   if (!employee) {
+    req.log.error(LOG_MESSAGES.AUTH.UNAUTHORIZED_ATTEMPT);
     res
-      .status(401)
-      .json({ error: "Something went wrong, please logout and log in again" });
+      .status(CLIENT_RESPONSE.UNAUTHORIZED.STATUS)
+      .json({ error: CLIENT_RESPONSE.UNAUTHORIZED.RETRY_LOGIN });
     return;
   }
 

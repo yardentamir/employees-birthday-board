@@ -1,11 +1,5 @@
-import { Document, Schema, Types, model } from "mongoose";
-
-export interface IBirthdayWish extends Document {
-  senderId: Types.ObjectId;
-  recipientId: Types.ObjectId;
-  message: string;
-  toJSON: () => this;
-}
+import { Schema, model } from "mongoose";
+import { IBirthdayWish } from "../types/wish.type";
 
 const birthdayWishSchema = new Schema<IBirthdayWish>(
   {

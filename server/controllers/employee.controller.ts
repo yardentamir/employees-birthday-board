@@ -1,34 +1,36 @@
 import { RequestHandler } from "express";
 import validator from "validator";
-import { AuthRequest } from "../middleware/auth";
 import {
   default as Employee,
   default as employeeModel,
 } from "../models/employee.model";
 import BirthdayService from "../service/birthday.service";
 import BirthdayWishService from "../service/birthdayWish.service";
+import mongoose from "mongoose";
+import LOG_MESSAGES from "../constants/logs.constant";
+import RESPONSE from "../constants/response.constant";
 
 export const signup: RequestHandler = async (req, res) => {
   try {
     const employeeBody = req.body;
-
-    req.log.info({ body: employeeBody }, "signup Body");
 
     const employee = new employeeModel(employeeBody);
     const token = await employee.generateAuthToken();
 
     await employee.save();
 
-    req.log.info("Employee signed up successfully");
-    res.status(201).send({ employee, token });
+    req.log.info(LOG_MESSAGES.AUTH.SUCCSESSFUL_SIGNUP);
+    res.status(RESPONSE.RECORED_CREATED.STATUS).send({ employee, token });
   } catch (error) {
     if (error instanceof Error) {
       req.log.error({
-        message: "Signup failed",
+        message: LOG_MESSAGES.AUTH.SIGNUP_FAILED,
         body: req.body,
         error: error.message,
       });
-      res.status(400).json({ error: error.message });
+      res
+        .status(RESPONSE.INTERNAL_SERVER_ERROR.STATUS)
+        .json({ error: error.message });
     }
   }
 };
@@ -38,13 +40,13 @@ export const login: RequestHandler = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      const errorMessage = "Email and Password are required";
+      const errorMessage = RESPONSE.BAD_REQUEST.REQUIRED_LOGIN;
       req.log.warn(errorMessage);
       throw new Error(errorMessage);
     }
 
     if (!validator.isEmail(email)) {
-      const errorMessage = "Email is invalid";
+      const errorMessage = RESPONSE.BAD_REQUEST.INVALID_EMAIL;
       req.log.warn(errorMessage);
       throw new Error(errorMessage);
     }
@@ -53,7 +55,7 @@ export const login: RequestHandler = async (req, res) => {
     const token = await employee.generateAuthToken();
 
     req.log.info({
-      message: "User login successful",
+      message: LOG_MESSAGES.AUTH.SUCCSESSFUL_LOGIN,
       userEmail: email,
       userId: employee._id,
     });
@@ -62,11 +64,11 @@ export const login: RequestHandler = async (req, res) => {
   } catch (error) {
     if (error instanceof Error) {
       req.log.error({
-        message: "Login failed",
+        message: LOG_MESSAGES.AUTH.LOGIN_FAILED,
         userEmail: req.body.email,
         error: error.message,
       });
-      res.status(400).json({ error: error.message });
+      res.status(RESPONSE.BAD_REQUEST.STATUS).json({ error: error.message });
     }
   }
 };
@@ -75,14 +77,14 @@ export const loadEmployees: RequestHandler = async (req, res) => {
   try {
     const employees = await employeeModel.find();
 
-    req.log.info("Successfully loaded all the employees");
+    req.log.info(LOG_MESSAGES.EMPLOYEES.LOAD_SUCCESS);
 
-    res.status(201).send(employees);
+    res.status(RESPONSE.RECORED_CREATED.STATUS).send(employees);
   } catch (error) {
     console.log(error);
     if (error instanceof Error) {
       req.log.error({
-        message: "Login failed",
+        message: LOG_MESSAGES.AUTH.LOGIN_FAILED,
         error: error.message,
       });
       res.status(400).json({ error: error.message });
@@ -90,7 +92,7 @@ export const loadEmployees: RequestHandler = async (req, res) => {
   }
 };
 
-export const logOut: RequestHandler = async function (req: AuthRequest, res) {
+export const logOut: RequestHandler = async function (req, res) {
   try {
     if (req.employee) {
       req.employee.tokens = req.employee.tokens.filter((token) => {
@@ -100,82 +102,81 @@ export const logOut: RequestHandler = async function (req: AuthRequest, res) {
 
       req.log.info(
         { employeeId: req.employee._id },
-        "Employee logged out successfully"
+        LOG_MESSAGES.AUTH.SUCCSESSFUL_LOGOUT
       );
-      res.status(200).send("log out successfully!");
+      res.status(RESPONSE.SUCCESS.STATUS).send(RESPONSE.SUCCESS.LOGIN);
     } else {
-      req.log.warn("Unauthorized attempt to log out");
-      res.status(401).json({ error: "Unauthorized" });
+      req.log.warn(LOG_MESSAGES.AUTH.UNAUTHORIZED_ATTEMPT);
+      res
+        .status(RESPONSE.UNAUTHORIZED.STATUS)
+        .json({ error: RESPONSE.UNAUTHORIZED.MESSAGE });
     }
   } catch (error) {
-    req.log.error({ error }, "Error during log out");
+    req.log.error({ error }, LOG_MESSAGES.AUTH.LOGOUT_FAILED);
     if (error instanceof Error) {
-      res.status(500).json({ error: "Internal Server Error" });
+      res
+        .status(RESPONSE.INTERNAL_SERVER_ERROR.STATUS)
+        .json({ error: RESPONSE.INTERNAL_SERVER_ERROR.MESSAGE });
     }
   }
 };
 
-export const logOutAll: RequestHandler = async (req: AuthRequest, res) => {
+export const logOutAll: RequestHandler = async (req, res) => {
   try {
-    if (req.employee) {
-      req.employee.tokens = [];
-      await req.employee.save();
-      req.log.info(
-        { employeeId: req.employee._id },
-        "Employee logged out from all devices successfully"
-      );
-      res.send();
-    } else {
-      req.log.warn("Unauthorized attempt to log out from all devices");
-      res.status(401).json({ error: "Unauthorized" });
-    }
+    req.employee.tokens = [];
+    await req.employee.save();
+    req.log.info(
+      { employeeId: req.employee._id },
+      LOG_MESSAGES.AUTH.LOGOUT_ALL_DEVICES
+    );
+    res.send();
   } catch (error) {
-    req.log.error({ error }, "Error during log out from all devices");
+    req.log.error({ error }, LOG_MESSAGES.AUTH.LOGOUT_ALL_DEVICES_FAILED);
     if (error instanceof Error) {
-      res.status(500).json({ error: "Internal Server Error" });
+      res
+        .status(RESPONSE.INTERNAL_SERVER_ERROR.STATUS)
+        .json({ error: RESPONSE.INTERNAL_SERVER_ERROR.MESSAGE });
     }
   }
 };
 
-export const loadEmployeesWithBirthdays: RequestHandler = async (
-  req: AuthRequest,
-  res
-) => {
+export const loadEmployeesWithBirthdays: RequestHandler = async (req, res) => {
   try {
     const employeesWithBirthdays =
       await BirthdayService.getEmployeesWithBirthdaysToday();
     res.status(200).json(employeesWithBirthdays);
   } catch (error) {
+    req.log.error({ error }, LOG_MESSAGES.EMPLOYEES.LOAD_BIRTHDAYS_FAILED);
     if (error instanceof Error) {
-      req.log.error({ error }, "Error loading employees with birthdays");
-      res.status(500).json({ error: "Internal Server Error" });
+      res
+        .status(RESPONSE.INTERNAL_SERVER_ERROR.STATUS)
+        .json({ error: RESPONSE.INTERNAL_SERVER_ERROR.MESSAGE });
     }
   }
 };
 
-export const logBirthdayWish: RequestHandler = async (
-  req: AuthRequest,
-  res
-) => {
+export const logBirthdayWish: RequestHandler = async (req, res) => {
   try {
     const { email, message } = req.body;
 
     if (!email || !message) {
-      res.status(400).json({ error: "Email and message are required" });
-      req.log.warn("Email and message are required");
+      res
+        .status(RESPONSE.BAD_REQUEST.STATUS)
+        .json({ error: RESPONSE.BAD_REQUEST.REQUIRED_LOGIN });
+      req.log.warn(RESPONSE.BAD_REQUEST.REQUIRED_LOGIN);
       return;
     }
 
     if (req.employee) {
       const employee = await Employee.findOne({ email });
       if (employee) {
-        const senderId = req.employee._id;
-        const recipientId = employee._id;
+        const senderId = req.employee._id as mongoose.Types.ObjectId;
+        const recipientId = employee._id as mongoose.Types.ObjectId;
         if (senderId.equals(recipientId)) {
-          res.status(400).json({
-            error: "Don't be silly, you can't wish happy birthday to yourself",
+          res.status(RESPONSE.BAD_REQUEST.STATUS).json({
+            error: RESPONSE.BAD_REQUEST.SELF_WISH,
           });
-          req.log.warn("Can't wish happy birthday to logged in employee");
+          req.log.warn(LOG_MESSAGES.WISHS.SELF_WISH);
           return;
         }
         const loggedWish = await BirthdayWishService.logBirthdayWish(
@@ -183,39 +184,53 @@ export const logBirthdayWish: RequestHandler = async (
           recipientId,
           message
         );
-        res.status(200).json(loggedWish);
-        req.log.info("Birthday wish logged successfully");
+        res.status(RESPONSE.SUCCESS.STATUS).json(loggedWish);
+        req.log.info(LOG_MESSAGES.WISHS.SUCCESSFUL_WISH);
       } else {
-        res.status(400).json({ error: "email and message are required" });
+        res
+          .status(RESPONSE.BAD_REQUEST.STATUS)
+          .json({ error: RESPONSE.BAD_REQUEST.REQUIRED_LOGIN });
         return;
       }
     } else {
-      req.log.warn("Unauthorized attempt to log out from all devices");
-      res.status(401).json({ error: "Unauthorized" });
+      req.log.warn(LOG_MESSAGES.AUTH.LOGOUT_ALL_DEVICES_FAILED);
+      res
+        .status(RESPONSE.UNAUTHORIZED.STATUS)
+        .json({ error: RESPONSE.UNAUTHORIZED.MESSAGE });
     }
   } catch (error) {
     console.log(error);
     if (error instanceof Error) {
-      req.log.error({ error }, "Error logging birthday wish");
-      res.status(500).json({ error: "Internal Server Error" });
+      req.log.error({ error }, LOG_MESSAGES.WISHS.WISH_LOG_FAILED);
+      res
+        .status(RESPONSE.INTERNAL_SERVER_ERROR.STATUS)
+        .json({ error: RESPONSE.INTERNAL_SERVER_ERROR.MESSAGE });
     }
   }
 };
 
-export const loadEmployeesWithWishes: RequestHandler = async (
-  req: AuthRequest,
-  res
-) => {
+export const loadEmployeesWithWishes: RequestHandler = async (req, res) => {
   try {
     const { employees, count } =
       await BirthdayWishService.getEmployeesWithWishes();
 
-    res.status(200).json({ count, employees });
-    req.log.info({ message: "Loaded employees with wishes successfully" });
+    res.status(RESPONSE.SUCCESS.STATUS).json({ count, employees });
+    req.log.info({
+      message: LOG_MESSAGES.EMPLOYEES.LOAD_EMPLOYEES_WITH_WISHES,
+    });
   } catch (error) {
     if (error instanceof Error) {
-      req.log.error({ error, message: "Error loading employees with wishes" });
-      res.status(500).json({ error: "Internal Server Error" });
+      req.log.error({
+        error,
+        message: LOG_MESSAGES.EMPLOYEES.LOAD_WISHES_FAILED,
+      });
+      res
+        .status(RESPONSE.INTERNAL_SERVER_ERROR.STATUS)
+        .json({ error: RESPONSE.INTERNAL_SERVER_ERROR.MESSAGE });
     }
   }
+};
+
+export const me: RequestHandler = (req, res) => {
+  res.status(RESPONSE.SUCCESS.STATUS).send(req.employee);
 };

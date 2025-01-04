@@ -1,7 +1,10 @@
 import { Types } from "mongoose";
-import logger from "../middleware/logger";
-import BirthdayWish, { IBirthdayWish } from "../models/birthdayWish.model";
-import Employee, { IEmployee } from "../models/employee.model";
+import logger from "../utils/logger.util";
+import BirthdayWish from "../models/birthdayWish.model";
+import Employee from "../models/employee.model";
+import { IBirthdayWish } from "../types/wish.type";
+import { IEmployeeDocument } from "../types/employee.type";
+import LOG_MESSAGES from "../constants/logs.constant";
 
 class BirthdayWishService {
   public static async logBirthdayWish(
@@ -10,7 +13,10 @@ class BirthdayWishService {
     message: string
   ): Promise<IBirthdayWish> {
     try {
-      logger.info({ senderId, recipientId, message }, "Logging birthday wish");
+      logger.info(
+        { senderId, recipientId, message },
+        LOG_MESSAGES.WISHS.LOGGING
+      );
 
       const birthdayWishToSend = new BirthdayWish({
         recipientId,
@@ -28,38 +34,33 @@ class BirthdayWishService {
 
       logger.info(
         { senderId, recipientId, message, savedWish, sentBirthdayWish },
-        "Birthday wish logged successfully"
+        LOG_MESSAGES.WISHS.SUCCESSFUL_LOG
       );
 
       return savedWish;
     } catch (error) {
       logger.error(
         { senderId, recipientId, message, error },
-        "Error logging birthday wish"
+        LOG_MESSAGES.WISHS.LOGGING_FAILED
       );
       throw error;
     }
   }
 
   public static async getEmployeesWithWishes(): Promise<{
-    employees: IEmployee[];
+    employees: IEmployeeDocument[];
     count: number;
   }> {
     try {
-      logger.info("Loading employees with at least one wish");
+      logger.info(LOG_MESSAGES.EMPLOYEES.LOADING_WITH_ATLEAST_ONE_WISH);
 
       const employeesWithWishes = await Employee.find({
         receivedWishes: { $exists: true, $not: { $size: 0 } },
       });
 
       logger.info(
-        { count: employeesWithWishes.length },
-        "Retrieved employees with at least one wish"
-      );
-
-      logger.info(
-        employeesWithWishes,
-        "array of employees with at least one wish"
+        { employeesWithWishes, count: employeesWithWishes.length },
+        LOG_MESSAGES.EMPLOYEES.SUCCESSFUL_WITH_ATLEAST_ONE_WISH
       );
 
       return {
@@ -67,7 +68,10 @@ class BirthdayWishService {
         count: employeesWithWishes.length,
       };
     } catch (error) {
-      logger.error({ error }, "Error getting employees with at least one wish");
+      logger.error(
+        { error },
+        LOG_MESSAGES.EMPLOYEES.LOAD_WITH_ATLEAST_ONE_WISH_FAILED
+      );
       throw error;
     }
   }
