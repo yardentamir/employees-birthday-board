@@ -8,7 +8,7 @@ const getAuthorizationHeader = () => {
 console.log(import.meta.env.MODE);
 
 const client: AxiosInstance = axios.create({
-  baseURL: import.meta.env.BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Authorization: getAuthorizationHeader(),
